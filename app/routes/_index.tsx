@@ -8,7 +8,7 @@ import { BadmintonSession } from "~/types/session";
 
 // Define the loader function to fetch session data
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const sessions = getSessions();
+  const sessions = mockSessions;
   return json({ sessions });
 };
 
@@ -135,4 +135,6 @@ export default function Index() {
             </div>
           </div>
         )}</div>
+        </div>
+  )
 }

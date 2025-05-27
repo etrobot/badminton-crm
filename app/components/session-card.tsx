@@ -6,6 +6,7 @@ import type { BadmintonSession } from "~/types/session";
 interface SessionCardProps {
   session: BadmintonSession;
   isMobile?: boolean;
+  onEdit: () => void;
 }
 
 export function SessionCard({ session, isMobile = false }: SessionCardProps) {
