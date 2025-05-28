@@ -16,9 +16,10 @@ export interface BadmintonSession {
   dateTime: string;
   sessionType: CourseType;
   equipment: string[];
-  clientType: '成人' | '青少年';
+  clientType: '青少年' | '成人';
   courtName: string;
   courtNumber: string;
   clients: Client[];
   totalClients: number;
+  feePerClient: number; // 单人学费
 }
