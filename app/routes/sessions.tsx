@@ -7,6 +7,7 @@ import { Link, Outlet, useLocation } from "@remix-run/react";
 import CRMFilter from "~/components/common/CRMFilter";
 import { SquarePenIcon,CirclePlusIcon } from 'lucide-react';
 import { BadmintonSession } from "~/types/session";
+import { sessionColumns as configSessionColumns } from "~/config/sessionColumns";
 
 
 const SessionTable: React.FC = () => {
@@ -73,21 +74,15 @@ const SessionTable: React.FC = () => {
   const handleQuery = (queryFilters: Record<string, string | string[]>) => {
     console.log('[SessionTable] 查询入参', queryFilters);
     const filtered = mockSessions.filter((item) => {
-      // 课程名多选
       if (queryFilters.title && (queryFilters.title as string[]).length > 0 && !(queryFilters.title as string[]).includes(item.title)) return false;
-      // 教练模糊
       if (queryFilters.coach && (queryFilters.coach as string[]).length > 0 && !(queryFilters.coach as string[]).includes(item.coach)) return false;
-      // 场地模糊
       if (queryFilters.courtName && (queryFilters.courtName as string[]).length > 0 && !(queryFilters.courtName as string[]).includes(item.courtName)) return false;
-      // 课程类型多选
       if (queryFilters.sessionType && (queryFilters.sessionType as string[]).length > 0 && !(queryFilters.sessionType as string[]).includes(item.sessionType)) return false;
-      // 学员多选
       if (queryFilters.clients && (queryFilters.clients as string[]).length > 0) {
         const selectedClients = queryFilters.clients as string[];
         const sessionClientNames = item.clients.map(client => client.name);
         if (!selectedClients.some(selectedClient => sessionClientNames.includes(selectedClient))) return false;
       }
-      // 单人学费多选
       if (queryFilters.feePerClient && (queryFilters.feePerClient as string[]).length > 0) {
         const selectedFees = queryFilters.feePerClient as string[];
         if (!selectedFees.includes(item.feePerClient.toString())) return false;
@@ -110,37 +105,14 @@ const SessionTable: React.FC = () => {
       title: "时间",
       dataIndex: "dateTime",
       render: (value) => {
-        const formatted = dayjs(value as string).format('YYYY-MM-DD HH:mm');
+        const formatted = dayjs(value as string).format('M月DD日 HH:mm');
         return <span>{formatted}</span>;
       }
     },
-    {
-      title: "课程名称",
-      dataIndex: "title",
-    },
-    { title: "教练", dataIndex: "coach" },
-    { title: "场地", dataIndex: "courtName" },
-    {
-      title: "学员",
-      dataIndex: "clients",
-      render: (value) => {
-        return (
-          <span>
-            {Array.isArray(value)
-              ? value.map(client => (client as { name: string }).name).join("，")
-              : ""}
-          </span>
-        );
-      }
-    },
-    {
-      title: "单人学费",
-      dataIndex: "feePerClient",
-      render: (value) => <span>￥{value}</span>
-    },
+    ...configSessionColumns,
     {
       title: "操作",
-      dataIndex: "actions",
+      dataIndex: "actions", // Using a placeholder dataIndex as actions are not part of the data structure
       render: (_, record) => (
         <Link to={`/sessions/edit/${record.id}`}>
           <Button size='sm' variant="outline" onClick={() => {

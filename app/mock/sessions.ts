@@ -20,7 +20,7 @@ export const mockSessions: BadmintonSession[] = [
   },
   {
     id: '2',
-    dateTime: '2025-05-29T09:00:00',
+    dateTime: '2025-12-29T09:00:00',
     title: '高级杀球技巧',
     coach: '张教练',
     sessionType: '一对二' as CourseType,

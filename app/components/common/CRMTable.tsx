@@ -1,18 +1,19 @@
 import { useState } from "react";
+import type { BadmintonSession } from "../../types/session";
 
 // 通用 Column 定义，将其导出以便 RecordCard 使用
-export interface Column<T = any> {
+export interface Column<T = BadmintonSession> {
   title: string;
   dataIndex: keyof T | string;
-  render?: (value: any, record: T) => React.ReactNode;
+  render?: (value: unknown, record: T) => React.ReactNode;
 }
 
-interface CRMTableProps<T = any> {
+interface CRMTableProps<T = BadmintonSession> {
   sessions: T[];
   columns: Column<T>[];
 }
 
-export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T>) {
+export default function CRMTable<T = BadmintonSession>({ sessions, columns }: CRMTableProps<T>) {
   // 排序状态
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -45,7 +46,7 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
     // 检查该列是否可排序（如果以后添加 sortable 属性可以在这里判断）
     // 目前假设所有列都可排序
     const clickedField = col.dataIndex as string;
-
+    console.log('[CRMTable] handleHeaderClick 入参:', clickedField);
     if (sortField === clickedField) {
       // 如果点击的是当前排序字段
       if (sortOrder === 'asc') {
@@ -97,10 +98,15 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
       </div>
       {/* 数据行 */}
       {sortedSessions.map((session, idx) => (
-        <div key={idx} className="w-full border-t bg-white hover:bg-gray-50 md:flex">
+        <div key={idx} className="w-full border rounded-lg md:rounded-none mb-1 md:mb-0 shadow-sm md:shadow-none flex flex-col md:flex-row">
           {columns.map((col, index) => (
-            <div key={col.dataIndex as string} className={`px-4 py-3 text-sm flex-1 ${index === 0 ? 'font-bold' : ''}`}>
-              {col.render ? col.render(session[col.dataIndex as keyof T], session) : String(session[col.dataIndex as keyof T])}
+            <div key={col.dataIndex as string} className={`px-4 py-2 text-sm flex justify-between items-center md:flex-1 ${index === 0 ? 'font-bold' : ''}`}>
+              {/* 移动端显示表头 */}
+              <div className="text-gray-500 md:hidden">{col.title}:</div>
+              {/* 数据内容 */}
+              <div className="text-right flex-1 md:text-left">
+                {col.render ? col.render(session[col.dataIndex as keyof T], session) : String(session[col.dataIndex as keyof T])}
+              </div>
             </div>
           ))}
         </div>
