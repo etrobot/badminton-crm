@@ -79,7 +79,7 @@ export default function CRMTable<T = BadmintonSession>({ sessions, columns }: CR
       <div className="hidden w-full bg-gray-50 border-b md:flex">
         {columns.map((col, index) => (
           <div
-            key={col.dataIndex as string}
+            key={String(col.dataIndex)}
             className={
               `px-4 py-3 text-sm flex-1 cursor-pointer select-none ${sortField === col.dataIndex ? 'text-blue-600' : ''} ${index === 0 ? 'font-bold' : ''}`
             }
@@ -97,20 +97,39 @@ export default function CRMTable<T = BadmintonSession>({ sessions, columns }: CR
         ))}
       </div>
       {/* 数据行 */}
-      {sortedSessions.map((session, idx) => (
-        <div key={idx} className="w-full border rounded-lg md:rounded-none mb-1 md:mb-0 shadow-sm md:shadow-none flex flex-col md:flex-row">
-          {columns.map((col, index) => (
-            <div key={col.dataIndex as string} className={`px-4 py-2 text-sm flex justify-between items-center md:flex-1 ${index === 0 ? 'font-bold' : ''}`}>
-              {/* 移动端显示表头 */}
-              <div className="text-gray-500 md:hidden">{col.title}:</div>
-              {/* 数据内容 */}
-              <div className="text-right flex-1 md:text-left">
-                {col.render ? col.render(session[col.dataIndex as keyof T], session) : String(session[col.dataIndex as keyof T])}
-              </div>
+      {sortedSessions.map((session, idx) => {
+        console.log('[CRMTable] 渲染数据行 idx:', idx, 'session:', session);
+        return (
+          <div key={idx} className="w-full border rounded-lg md:rounded-none mb-1 md:mb-0 shadow-sm md:shadow-none flex flex-col md:flex-row">
+            {/* 移动端：两列布局，只显示值 */}
+            <div className="flex flex-wrap md:hidden">
+              {columns.map((col, colIdx) => (
+                <div
+                  key={String(col.dataIndex)}
+                  className={`box-border px-4 py-2 text-sm flex-1 basis-1/2 ${colIdx % 2 === 0 ? 'text-left' : 'text-right'}`}
+                  style={{ minWidth: 0 }}
+                >
+                  {(() => {
+                    const value = col.render ? col.render(session[col.dataIndex as keyof T], session) : String(session[col.dataIndex as keyof T]);
+                    console.log(`[CRMTable] 移动端渲染 idx:${idx} colIdx:${colIdx} col:${String(col.dataIndex)} value:`, value);
+                    return value;
+                  })()}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ))}
+            {/* 桌面端：原有布局 */}
+            <div className="hidden md:flex w-full">
+              {columns.map((col, index) => (
+                <div key={String(col.dataIndex)} className={`px-4 py-2 text-sm flex justify-between items-center md:flex-1 ${index === 0 ? 'font-bold' : ''}`}>
+                  <div className="text-right md:text-left flex-1">
+                    {col.render ? col.render(session[col.dataIndex as keyof T], session) : String(session[col.dataIndex as keyof T])}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
