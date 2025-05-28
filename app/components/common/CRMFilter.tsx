@@ -158,7 +158,7 @@ const CRMFilter: React.FC<CRMFilterProps> = ({ configs, onQuery, onReset }) => {
   // 渲染表单内容（便于桌面/移动端复用）
   const renderForm = () => (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mx-4 m-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mx-4 m-4">
         {configs.map(renderFilterItem)}
       </div>
       <div className="flex justify-end space-x-2 pb-4 mx-4">
@@ -175,7 +175,7 @@ const CRMFilter: React.FC<CRMFilterProps> = ({ configs, onQuery, onReset }) => {
         console.log('[CRMFilter] shadcn Drawer onOpenChange', open);
         setIsDrawerOpen(open);
       }}>
-        <div className="flex justify-end">
+        <div>
           <DrawerTrigger asChild>
             <Button variant='outline' onClick={() => {console.log('[CRMFilter] 筛选Drawer打开');}}>
               <FilterIcon className="mr-2 h-4 w-4" />

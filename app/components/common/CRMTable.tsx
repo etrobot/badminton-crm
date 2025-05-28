@@ -28,6 +28,12 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
         result = aValue - bValue;
       } else if (typeof aValue === 'string' && typeof bValue === 'string') {
         result = aValue.localeCompare(bValue);
+      } else {
+        // 对于其他类型，可以根据需要添加比较逻辑，或者转换为字符串进行比较
+        // 这里简单地转换为字符串进行比较
+        const aStr = String(aValue);
+        const bStr = String(bValue);
+        result = aStr.localeCompare(bStr);
       }
       return sortOrder === 'asc' ? result : -result;
     });
@@ -36,21 +42,25 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
 
   // 处理表头点击
   const handleHeaderClick = (col: Column<T>) => {
-    if (col.dataIndex === 'feePerClient') {
-      if (sortField === 'feePerClient') {
-        if (sortOrder === 'asc') {
-          setSortOrder('desc');
-          console.log('[CRMTable] feePerClient排序顺序: desc');
-        } else if (sortOrder === 'desc') {
-          setSortField(null);
-          setSortOrder('asc'); // 恢复默认
-          console.log('[CRMTable] 取消feePerClient排序');
-        }
-      } else {
-        setSortField('feePerClient');
-        setSortOrder('asc');
-        console.log('[CRMTable] 设置排序字段为feePerClient, 顺序: asc');
+    // 检查该列是否可排序（如果以后添加 sortable 属性可以在这里判断）
+    // 目前假设所有列都可排序
+    const clickedField = col.dataIndex as string;
+
+    if (sortField === clickedField) {
+      // 如果点击的是当前排序字段
+      if (sortOrder === 'asc') {
+        setSortOrder('desc');
+        console.log(`[CRMTable] ${clickedField} 排序顺序: desc`);
+      } else { // sortOrder === 'desc'
+        setSortField(null); // 取消排序
+        setSortOrder('asc'); // 恢复默认顺序，为下次点击准备
+        console.log(`[CRMTable] 取消 ${clickedField} 排序`);
       }
+    } else {
+      // 如果点击的是新的字段
+      setSortField(clickedField);
+      setSortOrder('asc');
+      console.log(`[CRMTable] 设置排序字段为 ${clickedField}, 顺序: asc`);
     }
   };
 
@@ -65,11 +75,13 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
   return (
     <div className="mt-2">
       {/* 表头 */}
-      <div className="flex w-full bg-gray-50 border-b">
-        {columns.map((col) => (
+      <div className="hidden w-full bg-gray-50 border-b md:flex">
+        {columns.map((col, index) => (
           <div
             key={col.dataIndex as string}
-            className={`px-4 py-3 text-sm font-medium flex-1 cursor-pointer select-none ${col.dataIndex === 'feePerClient' ? 'text-blue-600' : ''}`}
+            className={
+              `px-4 py-3 text-sm flex-1 cursor-pointer select-none ${sortField === col.dataIndex ? 'text-blue-600' : ''} ${index === 0 ? 'font-bold' : ''}`
+            }
             onClick={() => handleHeaderClick(col)}
             role="button"
             tabIndex={0}
@@ -77,7 +89,7 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
           >
             {col.title}
             {/* 排序指示器 */}
-            {col.dataIndex === 'feePerClient' && sortField === 'feePerClient' && (
+            {sortField === col.dataIndex && (
               <span className="ml-1">{sortOrder === 'asc' ? '↑' : '↓'}</span>
             )}
           </div>
@@ -85,9 +97,9 @@ export default function CRMTable<T = any>({ sessions, columns }: CRMTableProps<T
       </div>
       {/* 数据行 */}
       {sortedSessions.map((session, idx) => (
-        <div key={idx} className="flex w-full border-b bg-white hover:bg-gray-50">
-          {columns.map((col) => (
-            <div key={col.dataIndex as string} className="px-4 py-3 text-sm flex-1">
+        <div key={idx} className="w-full border-t bg-white hover:bg-gray-50 md:flex">
+          {columns.map((col, index) => (
+            <div key={col.dataIndex as string} className={`px-4 py-3 text-sm flex-1 ${index === 0 ? 'font-bold' : ''}`}>
               {col.render ? col.render(session[col.dataIndex as keyof T], session) : String(session[col.dataIndex as keyof T])}
             </div>
           ))}

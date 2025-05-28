@@ -22,6 +22,7 @@ const SessionTable: React.FC = () => {
   const uniqueClients = Array.from(new Set(mockSessions.flatMap(session => session.clients.map(client => client.name)))).map(clientName => ({ label: clientName, value: clientName }));
   const uniqueSessionTypes = Array.from(new Set(mockSessions.map(session => session.sessionType))).map(sessionType => ({ label: sessionType, value: sessionType }));
   const uniqueTitles = Array.from(new Set(mockSessions.map(session => session.title))).map(title => ({ label: title, value: title }));
+  const uniqueFeePerClients = Array.from(new Set(mockSessions.map(session => session.feePerClient))).map(fee => ({ label: `￥${fee}`, value: fee.toString() }));
 
   // 搜索字段配置
   const filterConfigs: {
@@ -60,6 +61,12 @@ const SessionTable: React.FC = () => {
       type: "select",
       options: uniqueSessionTypes,
     },
+    {
+      name: "feePerClient",
+      label: "单人学费",
+      type: "select",
+      options: uniqueFeePerClients,
+    },
   ];
 
   // 查询逻辑
@@ -79,6 +86,11 @@ const SessionTable: React.FC = () => {
         const selectedClients = queryFilters.clients as string[];
         const sessionClientNames = item.clients.map(client => client.name);
         if (!selectedClients.some(selectedClient => sessionClientNames.includes(selectedClient))) return false;
+      }
+      // 单人学费多选
+      if (queryFilters.feePerClient && (queryFilters.feePerClient as string[]).length > 0) {
+        const selectedFees = queryFilters.feePerClient as string[];
+        if (!selectedFees.includes(item.feePerClient.toString())) return false;
       }
       return true;
     });

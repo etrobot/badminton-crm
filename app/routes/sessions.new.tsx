@@ -79,7 +79,7 @@ export default function NewSession() {
     ];
     const clientTypeOptions = [
         { label: '青少年', value: '青少年' },
-        { label: '青少年', value: '青少年' },
+        { label: '成人', value: '成人' },
         { label: '儿童', value: '儿童' },
     ];
 
