@@ -1,40 +1,67 @@
-# Welcome to Remix!
+# Badminton Course Management System Demo
 
-- 📖 [Remix docs](https://remix.run/docs)
+> [中文文档](README_cn.md) | English
 
-## Development
+A modern web-based badminton course management system demo built with cutting-edge technologies.
 
-Run the dev server:
+## Tech Stack
 
-```shellscript
-npm run dev
+- **Frontend**: React 18 + TypeScript
+- **Full-stack Framework**: Remix
+- **UI Components**: Radix UI + Custom Components
+- **Styling**: Tailwind CSS
+- **Form Handling**: React Hook Form + Zod Validation
+- **State Management**: React Context + Hooks
+- **Date Handling**: date-fns + react-day-picker
+- **Build Tool**: Vite
+
+## Key Features
+
+- Course Management: Create, view, edit, and delete courses
+- Student Management: Manage student information and enrollments
+- Schedule: Visual course timetable
+- Responsive Design: Works on all device sizes
+- Modern UI: Beautiful and intuitive user interface
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm 8+
+
+### Install Dependencies
+
+```bash
+pnpm install
 ```
 
-## Deployment
+### Development Mode
 
-First, build your app for production:
-
-```sh
-npm run build
+```bash
+pnpm dev
 ```
 
-Then run the app in production mode:
+### Build for Production
 
-```sh
-npm start
+```bash
+pnpm build
+pnpm start
 ```
 
-Now you'll need to pick a host to deploy it to.
+## Project Structure
 
-### DIY
+```
+.
+├── app/                    # Main application code
+│   ├── components/         # Reusable components
+│   ├── routes/             # Page routes
+│   ├── styles/             # Global styles
+│   └── utils/              # Utility functions
+├── public/                 # Static assets
+└── ...
+```
 
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
+## License
 
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+[MIT](LICENSE)
