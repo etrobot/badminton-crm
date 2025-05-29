@@ -76,7 +76,7 @@ export default function CRMTable<T = BadmintonSession>({ sessions, columns }: CR
   return (
     <div className="mt-2">
       {/* 表头 */}
-      <div className="hidden w-full bg-gray-50 border-b md:flex">
+      <div className="hidden w-full border-b md:flex">
         {columns.map((col, index) => (
           <div
             key={String(col.dataIndex)}

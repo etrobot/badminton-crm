@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 import { ThemeProvider } from "next-themes";
+import BottomNav from "./components/common/BottomNav";
 
 import "./tailwind.css";
 
@@ -38,6 +39,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
+        {/* 全局底部导航 */}
+        {typeof window !== 'undefined' && <BottomNav />}
       </body>
     </html>
   );

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import EditPage, { Column } from "~/components/common/EditPage";
-import { BadmintonSession, Client } from "~/types/session";
+import { BadmintonSession, Student } from "~/types/session";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { mockSessions } from "~/mock/sessions"; // 导入模拟数据
+import { mockSessions, mockStudents } from "~/mock/sessions"; // 导入模拟数据
 import MultiSelect from "~/components/common/MultiSelect";
 
 export async function loader({ params }: { params: { id: string } }) {
@@ -27,7 +27,7 @@ export default function EditSession() {
 
   // 如果 session 不存在，可以显示一个错误消息或者重定向
   if (!record) {
-    return <div className="p-8 max-w-xl mx-auto">课程不存在</div>;
+    return <div className="p-4 max-w-xl mx-auto">课程不存在</div>;
   }
 
   function handleChange(field: keyof BadmintonSession, value: unknown) {
@@ -44,13 +44,9 @@ export default function EditSession() {
     navigate('/sessions'); // 保存后跳转回列表页
   }
 
-  // 获取所有学员选项（去重）
-  const allClients: Client[] = Array.from(
-    new Map(
-      mockSessions.flatMap(s => s.clients).map(c => [c.id, c])
-    ).values()
-  );
-  const clientOptions = allClients.map(c => ({ label: c.name, value: c.id }));
+  // 获取所有学员选项
+  const allStudents: Student[] = mockStudents;
+  const studentOptions = allStudents.map(s => ({ label: s.name, value: s.id }));
 
   // 获取所有设备选项（去重）
   const allEquipment: string[] = Array.from(
@@ -85,16 +81,14 @@ export default function EditSession() {
     { title: "场地号", dataIndex: "courtNumber" },
     {
       title: "学员",
-      dataIndex: "clients",
+      dataIndex: "students",
       render: (value, _record, onFieldChange) => (
         <MultiSelect
-          options={clientOptions}
-          value={Array.isArray(value) ? (value as Client[]).map(c => typeof c === 'string' ? c : c.id) : []}
+          options={studentOptions}
+          value={Array.isArray(value) ? value : []}
           onChange={(ids: string[]) => {
-            // 通过id查找完整Client对象
-            const selectedClients: Client[] = allClients.filter(c => ids.includes(c.id));
-            console.log('[EditSession] 学员选择变更', ids, selectedClients);
-            onFieldChange(selectedClients);
+            console.log('[EditSession] 学员选择变更', ids);
+            onFieldChange(ids);
           }}
           placeholder="请选择学员"
           label="学员"
@@ -137,7 +131,7 @@ export default function EditSession() {
     },
     {
       title: "单人学费",
-      dataIndex: "feePerClient",
+      dataIndex: "feePerStudent",
       render: (value, _record, onFieldChange) => (
         <input
           type="number"
@@ -154,15 +148,15 @@ export default function EditSession() {
         />
       )
     },
-    // 总学员数 totalClients 是根据 clients 计算得出的，不作为编辑项
+    // 总学员数 totalStudents 是根据 students 计算得出的，不作为编辑项
     // {
     //   title: "总学员数",
-    //   dataIndex: "totalClients",
+    //   dataIndex: "totalStudents",
     // },
   ];
 
   return (
-    <div className="p-8 max-w-xl mx-auto">
+    <div className="p-4 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">编辑课程 (ID: {record.id})</h1> {/* 显示课程ID */}
       <EditPage
         record={record}

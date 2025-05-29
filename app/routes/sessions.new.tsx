@@ -1,9 +1,9 @@
 import { useState } from "react";
 import EditPage, { Column } from "~/components/common/EditPage";
-import { BadmintonSession, Client } from "~/types/session";
+import { BadmintonSession, Student } from "~/types/session";
 import { useNavigate } from "@remix-run/react";
 import ShortUniqueId from 'short-uuid';
-import { mockSessions } from "~/mock/sessions";
+import { mockStudents } from "~/mock/sessions";
 import MultiSelect from "~/components/common/MultiSelect";
 
 // 简单下拉组件
@@ -34,17 +34,17 @@ export default function NewSession() {
         clientType: '青少年',
         courtName: '',
         courtNumber: '',
-        clients: [],
-        totalClients: 0,
-        feePerClient: 0,
+        students: [],
+        totalStudents: 0,
+        feePerStudent: 0,
     });
     const navigate = useNavigate();
 
     function handleChange(field: keyof BadmintonSession, value: unknown) {
         console.log('[NewSession] 字段变更', field, value);
         // 自动更新总学员数
-        if (field === 'clients' && Array.isArray(value)) {
-            setRecord(r => ({ ...r, clients: value, totalClients: value.length }));
+        if (field === 'students' && Array.isArray(value)) {
+            setRecord(r => ({ ...r, students: value, totalStudents: value.length }));
         } else {
             setRecord(r => ({ ...r, [field]: value }));
         }
@@ -58,19 +58,17 @@ export default function NewSession() {
         navigate('/sessions');
     }
 
-    // 获取所有学员选项（去重）
-    const allClients: Client[] = Array.from(
-        new Map(
-            mockSessions.flatMap(s => s.clients).map(c => [c.id, c])
-        ).values()
-    );
-    const clientOptions = allClients.map(c => ({ label: c.name, value: c.id }));
+    // 获取所有学员选项
+    const allStudents: Student[] = mockStudents;
+    const studentOptions = allStudents.map(s => ({ label: s.name, value: s.id }));
 
     // 课程类型、设备、学员类型选项
     const sessionTypeOptions = [
         { label: '一对一', value: '一对一' },
-        { label: '小班课', value: '小班课' },
-        { label: '团体课', value: '团体课' },
+        { label: '一对二', value: '一对二' },
+        { label: '一对多', value: '一对多' },
+        { label: '夏令营', value: '夏令营' },
+        { label: '开放式团课', value: '开放式团课' },
     ];
     const equipmentOptions = [
         { label: '球拍', value: '球拍' },
@@ -116,15 +114,14 @@ export default function NewSession() {
         { title: "场地号", dataIndex: "courtNumber" },
         {
             title: "学员",
-            dataIndex: "clients",
+            dataIndex: "students",
             render: (value, _record, onFieldChange) => (
                 <MultiSelect
-                    options={clientOptions}
-                    value={Array.isArray(value) ? (value as Client[]).map(c => typeof c === 'string' ? c : c.id) : []}
+                    options={studentOptions}
+                    value={Array.isArray(value) ? value : []}
                     onChange={(ids: string[]) => {
-                        const selectedClients: Client[] = allClients.filter(c => ids.includes(c.id));
-                        console.log('[NewSession] 学员选择变更', ids, selectedClients);
-                        onFieldChange(selectedClients);
+                        console.log('[NewSession] 学员选择变更', ids);
+                        onFieldChange(ids);
                     }}
                     placeholder="请选择学员"
                     label="学员"
@@ -162,12 +159,12 @@ export default function NewSession() {
         },
         {
             title: "总学员数",
-            dataIndex: "totalClients",
+            dataIndex: "totalStudents",
             render: value => <span className="text-gray-400">{String(value)}</span>,
         },
         {
             title: "单人学费",
-            dataIndex: "feePerClient",
+            dataIndex: "feePerStudent",
             render: (value, _record, onFieldChange) => (
                 <input
                     type="number"
@@ -187,7 +184,7 @@ export default function NewSession() {
     ];
 
     return (
-        <div className="p-8 max-w-xl mx-auto">
+        <div className="p-4 max-w-xl mx-auto">
             <h1 className="text-2xl font-bold mb-4">新增课程</h1>
             <EditPage
                 record={record}

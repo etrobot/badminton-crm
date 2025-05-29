@@ -1,12 +1,21 @@
 export type CourseType = '一对一' | '一对二' | '一对多' | '夏令营' | '开放式团课';
 
-export interface Client {
+export interface Receipt {
+  sessionId: string;
+  coupon: number;
+  voucherId: string;
+}
+
+export interface Student {
   id: string;
   name: string;
   gender: 'male' | 'female';
-  age: number;
+  birthday: string;
   level: number;
-  attended: boolean;
+  prePay: number;
+  prePayVoucherId: string;
+  paidSessions: Receipt[];
+  remark: string;
 }
 
 export interface BadmintonSession {
@@ -19,7 +28,7 @@ export interface BadmintonSession {
   clientType: '青少年' | '成人';
   courtName: string;
   courtNumber: string;
-  clients: Client[];
-  totalClients: number;
-  feePerClient: number; // 单人学费
+  students:string[];
+  totalStudents: number;
+  feePerStudent: number; // 单人学费
 }

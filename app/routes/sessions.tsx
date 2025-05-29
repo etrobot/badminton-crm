@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { mockSessions } from "~/mock/sessions";
+import { mockSessions, mockStudents } from "~/mock/sessions";
 import { Button } from "~/components/ui/button";
 import CRMTable, { Column } from "~/components/common/CRMTable";
 import React, { useState } from "react";
@@ -20,10 +20,21 @@ const SessionTable: React.FC = () => {
   // Extract unique options from mockSessions
   const uniqueCoaches = Array.from(new Set(mockSessions.map(session => session.coach))).map(coach => ({ label: coach, value: coach }));
   const uniqueCourtNames = Array.from(new Set(mockSessions.map(session => session.courtName))).map(courtName => ({ label: courtName, value: courtName }));
-  const uniqueClients = Array.from(new Set(mockSessions.flatMap(session => session.clients.map(client => client.name)))).map(clientName => ({ label: clientName, value: clientName }));
+  // 生成所有课程涉及的学员姓名
+  const uniqueStudents = Array.from(
+    new Set(
+      mockSessions
+        .flatMap(session => session.students)
+        .map(studentId => {
+          const student = mockStudents.find(s => s.id === studentId);
+          return student?.name;
+        })
+        .filter(Boolean)
+    )
+  ).map(clientName => ({ label: clientName!, value: clientName! }));
   const uniqueSessionTypes = Array.from(new Set(mockSessions.map(session => session.sessionType))).map(sessionType => ({ label: sessionType, value: sessionType }));
   const uniqueTitles = Array.from(new Set(mockSessions.map(session => session.title))).map(title => ({ label: title, value: title }));
-  const uniqueFeePerClients = Array.from(new Set(mockSessions.map(session => session.feePerClient))).map(fee => ({ label: `￥${fee}`, value: fee.toString() }));
+  const uniqueFeePerStudents = Array.from(new Set(mockSessions.map(session => session.feePerStudent))).map(fee => ({ label: `￥${fee}`, value: fee.toString() }));
 
   // 搜索字段配置
   const filterConfigs: {
@@ -51,10 +62,10 @@ const SessionTable: React.FC = () => {
       options: uniqueCourtNames
     },
     {
-      name: "clients", // Add clients filter
+      name: "students", // Add students filter
       label: "学员",
       type: "select",
-      options: uniqueClients
+      options: uniqueStudents
     },
     {
       name: "sessionType",
@@ -63,10 +74,10 @@ const SessionTable: React.FC = () => {
       options: uniqueSessionTypes,
     },
     {
-      name: "feePerClient",
+      name: "feePerStudent",
       label: "单人学费",
       type: "select",
-      options: uniqueFeePerClients,
+      options: uniqueFeePerStudents,
     },
   ];
 
@@ -78,14 +89,19 @@ const SessionTable: React.FC = () => {
       if (queryFilters.coach && (queryFilters.coach as string[]).length > 0 && !(queryFilters.coach as string[]).includes(item.coach)) return false;
       if (queryFilters.courtName && (queryFilters.courtName as string[]).length > 0 && !(queryFilters.courtName as string[]).includes(item.courtName)) return false;
       if (queryFilters.sessionType && (queryFilters.sessionType as string[]).length > 0 && !(queryFilters.sessionType as string[]).includes(item.sessionType)) return false;
-      if (queryFilters.clients && (queryFilters.clients as string[]).length > 0) {
-        const selectedClients = queryFilters.clients as string[];
-        const sessionClientNames = item.clients.map(client => client.name);
-        if (!selectedClients.some(selectedClient => sessionClientNames.includes(selectedClient))) return false;
+      if (queryFilters.students && (queryFilters.students as string[]).length > 0) {
+        const selectedStudents = queryFilters.students as string[];
+        const sessionStudentNames = item.students
+          .map(studentId => {
+            const student = mockStudents.find(s => s.id === studentId);
+            return student?.name;
+          })
+          .filter(Boolean);
+        if (!selectedStudents.some(selectedClient => sessionStudentNames.includes(selectedClient))) return false;
       }
-      if (queryFilters.feePerClient && (queryFilters.feePerClient as string[]).length > 0) {
-        const selectedFees = queryFilters.feePerClient as string[];
-        if (!selectedFees.includes(item.feePerClient.toString())) return false;
+      if (queryFilters.feePerStudent && (queryFilters.feePerStudent as string[]).length > 0) {
+        const selectedFees = queryFilters.feePerStudent as string[];
+        if (!selectedFees.includes(item.feePerStudent.toString())) return false;
       }
       return true;
     });
@@ -101,14 +117,6 @@ const SessionTable: React.FC = () => {
 
   // 定义 columns 配置
   const columns: Column<BadmintonSession>[] = [
-    {
-      title: "时间",
-      dataIndex: "dateTime",
-      render: (value) => {
-        const formatted = dayjs(value as string).format('M月DD日 HH:mm');
-        return <span>{formatted}</span>;
-      }
-    },
     ...configSessionColumns,
     {
       title: "操作",

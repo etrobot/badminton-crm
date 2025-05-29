@@ -1,6 +1,8 @@
-import { BadmintonSession, Client } from "~/types/session";
+import { BadmintonSession } from "~/types/session";
 import React from "react";
 import Tag from "../components/common/Tag";
+import dayjs from "dayjs";
+import { mockStudents } from "~/mock/sessions";
 
 // 通用 Table 组件 Column 类型定义
 export interface Column<T> {
@@ -24,6 +26,14 @@ const clientTypeColorMap: Record<string, string> = {
 
 export const sessionColumns: Column<BadmintonSession>[] = [
   {
+    title: "时间",
+    dataIndex: "dateTime",
+    render: (value) => {
+      const formatted = dayjs(value as string).format('M月DD日 HH:mm');
+      return <span>{formatted}</span>;
+    }
+  },
+  {
     title: "课程名称",
     dataIndex: "title",
   },
@@ -45,14 +55,14 @@ export const sessionColumns: Column<BadmintonSession>[] = [
   },
   {
     title: "学员",
-    dataIndex: "clients",
-    render: (value: unknown) => (
-      <span>
-        {Array.isArray(value)
-          ? (value as Client[]).map((client: Client) => (client && client.name ? client.name : '')).join('，')
-          : ''}
-      </span>
-    ),
+    dataIndex: "students",
+    render: (value) => {
+      const names = (Array.isArray(value) ? value : []).map(id => {
+        const student = mockStudents.find(s => s.id === id);
+        return student ? student.name : id;
+      });
+      return <span>{names.join('、')}</span>;
+    }
   },
   // 操作列建议在页面本地定义
 ];
